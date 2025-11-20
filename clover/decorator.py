@@ -1,9 +1,26 @@
 from argparse import ArgumentParser
-from inspect import signature
+from ast import literal_eval
+from pathlib import Path
+from inspect import Parameter, signature
 import logging
 
 clog = logging.getLogger(__name__)
 clover_parser = ArgumentParser()
+
+
+def _try_eval_literal(s: str, warn_arg_name: str = None):
+    warn_arg_name = warn_arg_name or s
+    try:
+        return literal_eval(s)
+    except ValueError as ve:
+        if str(ve).startswith("malformed node or string"):
+            clog.warning(
+                f"Faild to infer python type for {warn_arg_name}; "
+                "Assuming type string."
+            )
+            return s
+        else:
+            raise ve
 
 
 def clover(fn):
@@ -31,6 +48,17 @@ def clover(fn):
             and (k.rsplit(".", 1)[0] == fn.__qualname__)
         }
         clog.debug(f"Sanitized parsed cli kwargs to: {parsed_args}")
+
+        for pname in parsed_args.keys():
+            p = spam[pname]
+            if (p.annotation != Parameter.empty and p.annotation != str) or (
+                (p.default != Parameter.empty) and (not isinstance(p.default, str))
+            ):
+                parsed_args[pname] = _try_eval_literal(
+                    parsed_args[pname], f"--{fn.__qualname__}.{pname}"
+                )
+        types = {k: type(v) for k, v in parsed_args.items()}
+        clog.debug(f"Types after evaluation: {types}")
 
         updated_args = dict(zip(param_names, args))
         updated_args.update(kwargs)

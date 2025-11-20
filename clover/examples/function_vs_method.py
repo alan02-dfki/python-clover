@@ -1,6 +1,6 @@
 import logging
 
-from decorator import clover
+from ..decorator import clover
 
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
