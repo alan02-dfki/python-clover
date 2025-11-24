@@ -38,11 +38,11 @@ values specified in this config file are substituted.
 
 Optional arguments obtained from a config file have default
 values as specified in the config.
-Refer to the file [example_config.yaml](examples/example_config.yaml).
+Refer to the file [example_config.yaml](clover/examples/example_config.yaml).
 In particular, note, that in the config, too, the parameters are prefixed
 with the full qualified name for the method or function they belong to.
 
-You can run an [example script](examples/config_parsing.py)
+You can run an [example script](clover/examples/config_parsing.py)
 demonstrating this behavior with the following command:
 
 ```bash
