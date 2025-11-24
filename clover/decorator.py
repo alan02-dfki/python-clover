@@ -1,14 +1,19 @@
 from argparse import ArgumentParser
 from ast import literal_eval
-from pathlib import Path
 from inspect import Parameter, signature
 import logging
+from pathlib import Path
+from typing import Optional
+
+import yaml
+
 
 clog = logging.getLogger(__name__)
-clover_parser = ArgumentParser()
+clover_parser = ArgumentParser(conflict_handler="resolve")
+global_cfg_dct = dict()
 
 
-def _try_eval_literal(s: str, warn_arg_name: str = None):
+def _try_eval_literal(s: str, warn_arg_name: Optional[str] = None):
     warn_arg_name = warn_arg_name or s
     try:
         return literal_eval(s)
@@ -23,6 +28,24 @@ def _try_eval_literal(s: str, warn_arg_name: str = None):
             raise ve
 
 
+def connect_config(config_path: str | Path):
+    """
+    Params from the config file override params from code
+    but not those from cli.
+    Calling this method multiple times updates the config dict used by clover.
+    """
+    with open(config_path, "r") as yamfile:
+        cfg_dct = yaml.safe_load(yamfile)
+
+    if cfg_dct is None:
+        clog.warning("Connected empty config.")
+    else:
+        global_cfg_dct.update(cfg_dct)
+        clog.debug(f"Adding config {cfg_dct} to clover parser.")
+        for k, v in cfg_dct.items():
+            clover_parser.add_argument(f"--{k}", default=v)
+
+
 def clover(fn):
     def overridden(*args, **kwargs):
         clog.debug(
@@ -35,7 +58,9 @@ def clover(fn):
         clog.debug(f"Identified param names: {list(param_names)}")
 
         for pn in param_names:
-            clover_parser.add_argument(f"--{fn.__qualname__}.{pn}")
+            qual_pn = f"{fn.__qualname__}.{pn}"
+            default = global_cfg_dct.get(qual_pn, None)
+            clover_parser.add_argument(f"--{qual_pn}", default=default)
         parsed_args = vars(clover_parser.parse_known_args()[0])
         clog.debug(f"Parsed the following args from cil: {parsed_args}")
 
@@ -60,9 +85,9 @@ def clover(fn):
         types = {k: type(v) for k, v in parsed_args.items()}
         clog.debug(f"Types after evaluation: {types}")
 
-        updated_args = dict(zip(param_names, args))
-        updated_args.update(kwargs)
-        updated_args.update(parsed_args)
+        updated_args = dict(zip(param_names, args))  # args passed at function call
+        updated_args.update(kwargs)  # kwargs passed at function call
+        updated_args.update(parsed_args)  # optargs from cli with defaults from config
         clog.debug(
             f"Forwarding the following (kw)args to wrapped function: {updated_args}"
         )

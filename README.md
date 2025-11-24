@@ -24,3 +24,31 @@ python -m clover.examples.type_casting \
   --type_casting.anl "[1, 2]" \
   --type_casting.andct "{'a':1, 'b':2}"
 ```
+
+### Config File
+When calling `clover.decorator.connect_config` with a path to a config file
+in yaml format _all_ of its fields are converted to optional arguments
+(regardless of whether they are used).
+Then, when decorating a function or method with `@clover`,
+values specified in this config file are substituted.
+
+> [!IMPORTANT]
+> The substitution priority is:<br>
+> code < config < cli
+
+Optional arguments obtained from a config file have default
+values as specified in the config.
+Refer to the file [example_config.yaml](examples/example_config.yaml).
+In particular, note, that in the config, too, the parameters are prefixed
+with the full qualified name for the method or function they belong to.
+
+You can run an [example script](examples/config_parsing.py)
+demonstrating this behavior with the following command:
+
+```bash
+python -m clover.examples.config_parsing \
+  --configured_fn.cli_only "cli_cl" \
+  --configured_fn.config_and_cli "cli_cf_cl" \
+  --configured_fn.code_and_cli "cli_co_cl" \
+  --configured_fn.code_config_and_cli "cli_co_cf_cl" 
+```

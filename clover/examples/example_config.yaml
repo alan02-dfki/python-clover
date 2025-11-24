@@ -1,0 +1,4 @@
+configured_fn.config_only: config_cf
+configured_fn.code_and_config: config_co_cf
+configured_fn.config_and_cli: config_cf_cl
+configured_fn.code_config_and_cli: config_co_cf_cl
