@@ -3,7 +3,7 @@ from ast import literal_eval
 from inspect import Parameter, signature
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Dict, List, Optional
 
 import yaml
 
@@ -76,8 +76,14 @@ def clover(fn):
 
         for pname in parsed_args.keys():
             p = spam[pname]
-            if (p.annotation != Parameter.empty and p.annotation != str) or (
-                (p.default != Parameter.empty) and (not isinstance(p.default, str))
+            qual_pname = f"{fn.__qualname__}.{pname}"
+            if (
+                (p.annotation != Parameter.empty and p.annotation != str)
+                or ((p.default != Parameter.empty) and (not isinstance(p.default, str)))
+                or (
+                    (qual_pname in global_cfg_dct)
+                    and (not isinstance(global_cfg_dct[qual_pname], str))
+                )
             ):
                 parsed_args[pname] = _try_eval_literal(
                     parsed_args[pname], f"--{fn.__qualname__}.{pname}"
