@@ -32,6 +32,26 @@ def configured_fn(
         log.info(f"arg {k.ljust(20)} assumed value {v}.")
 
 
+@clover
+def complex_type_cfg(
+    list_from_cli,
+    list_from_cfg,
+    list_from_cfg_overridden,
+):
+    log.info(
+        f"list_from_cli: {list_from_cli} has type"
+        f"{type(list_from_cli)} of {type(list_from_cli[0])}"
+    )
+    log.info(
+        f"list_from_cfg: {list_from_cfg} has type"
+        f"{type(list_from_cfg)} of {type(list_from_cfg[0])}"
+    )
+    log.info(
+        f"list_from_cfg_overridden: {list_from_cfg_overridden} has type"
+        f"{type(list_from_cfg_overridden)} of {type(list_from_cfg_overridden[0])}"
+    )
+
+
 if __name__ == "__main__":
     connect_config(Path(__file__).parent.joinpath("example_config.yaml"))
     configured_fn(
@@ -40,3 +60,4 @@ if __name__ == "__main__":
         code_and_cli="code_co_cl",
         code_config_and_cli="code_co_cf_cl",
     )
+    complex_type_cfg()

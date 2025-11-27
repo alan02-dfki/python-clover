@@ -50,5 +50,8 @@ python -m clover.examples.config_parsing \
   --configured_fn.cli_only "cli_cl" \
   --configured_fn.config_and_cli "cli_cf_cl" \
   --configured_fn.code_and_cli "cli_co_cl" \
-  --configured_fn.code_config_and_cli "cli_co_cf_cl" 
+  --configured_fn.code_config_and_cli "cli_co_cf_cl" \
+  \
+  --complex_type_cfg.list_from_cli "[0.1, 0.2, 0.3]" \
+  --complex_type_cfg.list_from_cfg_overridden "[0.0001, 0.0002, 0.0003]"
 ```
