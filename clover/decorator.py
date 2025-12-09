@@ -3,7 +3,7 @@ from ast import literal_eval
 from inspect import Parameter, signature
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 
 import yaml
 
@@ -45,11 +45,17 @@ def connect_config(config_path: str | Path):
 
     if cfg_dct is None:
         clog.warning("Connected empty config.")
+    elif "clover" not in cfg_dct:
+        clog.warning("Connected confg has no clover section.")
     else:
-        global_cfg_dct.update(cfg_dct)
-        clog.debug(f"Adding config {cfg_dct} to clover parser.")
-        for k, v in cfg_dct.items():
-            clover_parser.add_argument(f"--{k}", default=v)
+        clover_cfg = cfg_dct["clover"]
+        # global_cfg_dct.update(clover_cfg)
+        clog.debug(f"Adding config {clover_cfg} to clover parser.")
+        for fn_sec, fn_params in clover_cfg.items():
+            for p_name, p_val in fn_params.items():
+                param = f"{fn_sec}.{p_name}"
+                global_cfg_dct[param] = p_val
+                clover_parser.add_argument(f"--{param}", default=p_val)
 
 
 def clover(fn):
@@ -100,7 +106,6 @@ def clover(fn):
         clog.debug(
             f"Forwarding the following (kw)args to wrapped function: {updated_args}"
         )
-
         return fn(**updated_args)
 
     return overridden

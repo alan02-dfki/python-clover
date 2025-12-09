@@ -1,7 +1,21 @@
-configured_fn.config_only: config_cf
-configured_fn.code_and_config: config_co_cf
-configured_fn.config_and_cli: config_cf_cl
-configured_fn.code_config_and_cli: config_co_cf_cl
+# python-clover will only parse arguments under this key.
+# This allows for sharing the config file with other code parts
+# that are not supposed to be expossed to the cli
+clover: 
 
-complex_type_cfg.list_from_cfg: [0.01, 0.02, 0.03]
-complex_type_cfg.list_from_cfg_overridden: [0.001, 0.002, 0.003]
+  # The qualified name of the method or function to be overridden
+  configured_fn: 
+    # The parameters of the method or function 
+    # and the values they should assume
+    config_only: config_cf
+    code_and_config: config_co_cf
+    config_and_cli: config_cf_cl
+    code_config_and_cli: config_co_cf_cl
+
+  complex_type_cfg:
+    list_from_cfg: [0.01, 0.02, 0.03]
+    list_from_cfg_overridden: [0.001, 0.002, 0.003]
+
+# The outside of the clover section is ignored and can be used 
+# for non-clover-related configuration
+other_key: other_value
