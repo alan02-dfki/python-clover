@@ -1,7 +1,36 @@
 # python-clover
 Clover - Command line override for python callables
 
-## Example Requests
+## Installation
+```bash
+git clone git@github.com:alan02-dfki/python-clover.git
+pip install ./python_clover
+```
+
+## Basic Usage
+
+Just add the clover decorator to any function or method and let it do it's magic.
+
+```python example.py
+from clover import clover
+
+@clover
+def my_fun(p0, p1):
+    print(p0, p1)
+
+my_fun()
+```
+
+Your IDE may complain about the lack of arguments but the code will run
+as long as the necessary parameters are provided via the command line,
+like so:
+
+```bash
+$ python example.py --my_fun.p0 foo --my_fun.p1 bar
+foo bar
+```
+
+## In-depth Behavior Showcase
 
 ### Function vs Method
 ```bash

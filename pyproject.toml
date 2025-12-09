@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-clover"
+authors = [
+    {name = "Alexander Anisimov", email = "alexander.anisimov@dfki.de"},
+]
+version = "0.1.0"
+dependencies = ["PyYAML>=6.0.3"]
+
+[tool.setuptools.packages]
+find = {}
