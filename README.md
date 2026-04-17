@@ -56,7 +56,7 @@ python -m clover.examples.type_casting \
 
 ### Config File
 When calling `clover.decorator.connect_config` with a path to a config file
-in yaml format _all_ of its fields are converted to optional arguments
+in yaml format,  all the fields under the `"clover"`-tag are converted to optional arguments
 (regardless of whether they are used).
 Then, when decorating a function or method with `@clover`,
 values specified in this config file are substituted.
@@ -84,3 +84,7 @@ python -m clover.examples.config_parsing \
   --complex_type_cfg.list_from_cli "[0.1, 0.2, 0.3]" \
   --complex_type_cfg.list_from_cfg_overridden "[0.0001, 0.0002, 0.0003]"
 ```
+
+### Known Issues
+- The library has currently trouble with unspecified keyword arguments.
+One workaround is to use a named, dedicated `dict` holding all the kwargs instead.
