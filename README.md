@@ -86,6 +86,6 @@ python -m clover.examples.config_parsing \
   --complex_type_cfg.list_from_cfg_overridden "[0.0001, 0.0002, 0.0003]"
 ```
 
-### Known Issues
+## Known Issues
 - The library has currently trouble with unspecified keyword arguments.
 One workaround is to use a named, dedicated `dict` holding all the kwargs instead.
