@@ -9,9 +9,10 @@ pip install ./python_clover
 
 ## Basic Usage
 
-Just add the clover decorator to any function or method and let it do it's magic.
+Assuming you have a python file `example.py` with the following contents,
+just add the clover decorator to any function or method and let it do it's magic.
 
-```python example.py
+```python
 from clover import clover
 
 @clover
