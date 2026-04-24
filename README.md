@@ -38,10 +38,12 @@ foo bar
 python -m clover.examples.function_vs_method \
   --module_function.overridden_arg foo \
   --module_function.overridden_kwarg bar \
+  --mofu.arg foo \
   --Dog.__init__.name Spot \
   --Dog.bark.bark woof \
   --Dog.dig.burrow hole \
-  --Dog.wag.body_part tail
+  --Dog.wag.body_part tail \
+  --sniff.obj hydrant
 ```
 
 ### Type Casting

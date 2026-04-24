@@ -7,7 +7,7 @@ name = "python-clover"
 authors = [
     {name = "Alexander Anisimov", email = "alexander.anisimov@dfki.de"},
 ]
-version = "0.1.0"
+version = "0.1.1"
 dependencies = ["PyYAML>=6.0.3"]
 
 [tool.setuptools.packages]
