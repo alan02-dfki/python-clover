@@ -18,15 +18,17 @@ def _try_eval_literal(s, warn_arg_name: Optional[str] = None):
     if isinstance(s, str):
         try:
             return literal_eval(s)
-        except ValueError as ve:
-            if str(ve).startswith("malformed node or string"):
+        except (ValueError, SyntaxError) as e:
+            if str(e).startswith("malformed node or string") or str(e).startswith(
+                "invalid decimal literal"
+            ):
                 clog.warning(
                     f"Faild to infer python type for arg {warn_arg_name} with value {s}; "
                     "Assuming type string."
                 )
                 return s
             else:
-                raise ve
+                raise e
     else:
         clog.debug(
             f"Skipping literal evaluation since {warn_arg_name} has type {type(s)}."
