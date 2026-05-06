@@ -42,7 +42,7 @@ class CloverParser:
         if name == "--":
             return name
         else:
-            return f"--{self.id}.{name.strip("-")}"
+            return f"--{self.id}.{name.strip('-')}"
 
     def parse(self):
         if not self.populated:
