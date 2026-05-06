@@ -1,4 +1,3 @@
-from argparse import ArgumentParser
 from ast import literal_eval
 from functools import wraps
 from inspect import Parameter, signature
@@ -6,11 +5,10 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-import yaml
+
+from .parser import CloverParser
 
 clog = logging.getLogger(__name__)
-clover_parser = ArgumentParser(conflict_handler="resolve")
-global_cfg_dct = dict()
 
 
 def _try_eval_literal(s, warn_arg_name: Optional[str] = None):
@@ -37,27 +35,7 @@ def _try_eval_literal(s, warn_arg_name: Optional[str] = None):
 
 
 def connect_config(config_path: str | Path):
-    """
-    Params from the config file override params from code
-    but not those from cli.
-    Calling this method multiple times updates the config dict used by clover.
-    """
-    with open(config_path, "r") as yamfile:
-        cfg_dct = yaml.safe_load(yamfile)
-
-    if cfg_dct is None:
-        clog.warning("Connected empty config.")
-    elif "clover" not in cfg_dct:
-        clog.warning("Connected confg has no clover section.")
-    else:
-        clover_cfg = cfg_dct["clover"]
-        # global_cfg_dct.update(clover_cfg)
-        clog.debug(f"Adding config {clover_cfg} to clover parser.")
-        for fn_sec, fn_params in clover_cfg.items():
-            for p_name, p_val in fn_params.items():
-                param = f"{fn_sec}.{p_name}"
-                global_cfg_dct[param] = p_val
-                clover_parser.add_argument(f"--{param}", default=p_val)
+    CloverParser.connect_config(config_path)
 
 
 def clover(fn=None, *, alias: Optional[str] = None):
@@ -77,15 +55,14 @@ def clover(fn=None, *, alias: Optional[str] = None):
                     f"aliased as {alias} with args={args} and kwargs={kwargs}"
                 )
 
+            clover_parser = CloverParser(id=identifier)
             spam = signature(fn).parameters
             param_names = spam.keys()
             clog.debug(f"Identified param names: {list(param_names)}")
 
             for pn in param_names:
-                qual_pn = f"{identifier}.{pn}"
-                default = global_cfg_dct.get(qual_pn, None)
-                clover_parser.add_argument(f"--{qual_pn}", default=default)
-            parsed_args = vars(clover_parser.parse_known_args()[0])
+                clover_parser.add_argument(pn)
+            parsed_args = clover_parser.parse()
             clog.debug(f"Parsed the following args from cil: {parsed_args}")
 
             # dropping Nones for now but unclear how robust that is
@@ -100,14 +77,13 @@ def clover(fn=None, *, alias: Optional[str] = None):
 
             for pname in parsed_args.keys():
                 p = spam[pname]
-                qual_pname = f"{identifier}.{pname}"
                 if (
                     (p.annotation != Parameter.empty and p.annotation != str)
                     or (
                         (p.default != Parameter.empty)
                         and (not isinstance(p.default, str))
                     )
-                    or (qual_pname in global_cfg_dct)
+                    or (pname in clover_parser.cfg_params)
                 ):
                     parsed_args[pname] = _try_eval_literal(
                         parsed_args[pname], f"--{identifier}.{pname}"
